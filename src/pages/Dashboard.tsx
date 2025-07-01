@@ -4,51 +4,140 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Heart, User, Activity, Calendar, AlertTriangle, BarChart3 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 const Dashboard = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [dailyMessage, setDailyMessage] = useState("");
+  const [recentActivity, setRecentActivity] = useState<any[]>([]);
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { user, profile, signOut, loading } = useAuth();
 
   useEffect(() => {
-    // Check if user is logged in
-    const userEmail = localStorage.getItem("userEmail");
-    if (!userEmail) {
+    if (!loading && !user) {
       navigate("/login");
+      return;
+    }
+
+    // Redirect admin users to admin dashboard
+    if (profile?.role === 'admin') {
+      navigate("/admin");
       return;
     }
 
     // Update time every minute
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
 
-    // Set daily motivational message
-    const messages = [
-      "Today is a new opportunity to care for your wellbeing. Take it one moment at a time.",
-      "Remember: progress isn't always visible, but every small step matters.",
-      "You have the strength to face today's challenges. Trust in your resilience.",
-      "Breathe deeply. You are exactly where you need to be right now.",
-      "Your mental health matters. Thank you for taking time to check in with yourself."
-    ];
-    
-    const dayOfYear = Math.floor((currentTime.getTime() - new Date(currentTime.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
-    setDailyMessage(messages[dayOfYear % messages.length]);
+    // Fetch daily message
+    fetchDailyMessage();
+
+    // Fetch recent activity
+    fetchRecentActivity();
 
     return () => clearInterval(timer);
-  }, [navigate, currentTime]);
+  }, [user, profile, loading, navigate]);
 
-  const handleLogout = () => {
-    localStorage.clear();
-    toast({
-      title: "Logged Out",
-      description: "Take care of yourself. See you soon!",
-    });
+  const fetchDailyMessage = async () => {
+    try {
+      const { data, error } = await supabase.rpc('get_daily_message', {
+        user_language: profile?.language || 'en'
+      });
+
+      if (data && data.length > 0) {
+        setDailyMessage(data[0].content);
+      } else {
+        // Fallback message
+        setDailyMessage("Today is a new opportunity to care for your wellbeing. Take it one moment at a time.");
+      }
+    } catch (error) {
+      console.error('Error fetching daily message:', error);
+      setDailyMessage("Welcome to your wellbeing journey. Every step forward matters.");
+    }
+  };
+
+  const fetchRecentActivity = async () => {
+    if (!user) return;
+
+    try {
+      // Fetch recent moods
+      const { data: moods } = await supabase
+        .from('moods')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(2);
+
+      // Fetch recent exercises
+      const { data: exercises } = await supabase
+        .from('exercises')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('completed_at', { ascending: false })
+        .limit(2);
+
+      const activities = [];
+
+      if (moods) {
+        moods.forEach(mood => {
+          activities.push({
+            type: 'mood',
+            description: `Mood tracked (${mood.mood_score}/5)`,
+            date: new Date(mood.created_at),
+            icon: Heart,
+            color: 'text-green-600 bg-green-50'
+          });
+        });
+      }
+
+      if (exercises) {
+        exercises.forEach(exercise => {
+          activities.push({
+            type: 'exercise',
+            description: `${exercise.type} exercise completed`,
+            date: new Date(exercise.completed_at),
+            icon: Activity,
+            color: 'text-blue-600 bg-blue-50'
+          });
+        });
+      }
+
+      // Sort by date
+      activities.sort((a, b) => b.date.getTime() - a.date.getTime());
+      setRecentActivity(activities.slice(0, 3));
+    } catch (error) {
+      console.error('Error fetching recent activity:', error);
+    }
+  };
+
+  const handleLogout = async () => {
+    await signOut();
     navigate("/");
   };
 
+  const formatTimeAgo = (date: Date) => {
+    const now = new Date();
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+    
+    if (diffInHours < 1) return "Just now";
+    if (diffInHours < 24) return `${diffInHours} hours ago`;
+    if (diffInHours < 48) return "Yesterday";
+    return `${Math.floor(diffInHours / 24)} days ago`;
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-blue-100 flex items-center justify-center">
+        <div className="text-center">
+          <Heart className="h-12 w-12 text-green-600 mx-auto mb-4 animate-pulse" />
+          <p className="text-blue-700">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
   const timeOfDay = currentTime.getHours() < 12 ? "morning" : currentTime.getHours() < 18 ? "afternoon" : "evening";
-  const userEmail = localStorage.getItem("userEmail") || "friend";
+  const userName = profile?.email?.split('@')[0] || 'friend';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-blue-100">
@@ -60,7 +149,7 @@ const Dashboard = () => {
             <h1 className="text-lg sm:text-2xl font-bold text-blue-900">Wellbeing Support</h1>
           </div>
           <div className="flex items-center space-x-2 sm:space-x-4">
-            <span className="text-sm sm:text-base text-blue-700 hidden sm:inline">Welcome, {userEmail.split('@')[0]}</span>
+            <span className="text-sm sm:text-base text-blue-700 hidden sm:inline">Welcome, {userName}</span>
             <Button variant="outline" onClick={handleLogout} className="bg-white/50 text-sm sm:text-base px-2 sm:px-4">
               Logout
             </Button>
@@ -174,25 +263,25 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-3 sm:space-y-4">
-              <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
-                  <span className="text-green-800 text-sm sm:text-base">Mood tracked</span>
+              {recentActivity.length > 0 ? (
+                recentActivity.map((activity, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <activity.icon className={`h-4 w-4 sm:h-5 sm:w-5 ${activity.color.split(' ')[0]}`} />
+                      <span className={`text-sm sm:text-base ${activity.color.split(' ')[0].replace('text-', 'text-').replace('-600', '-800')}`}>
+                        {activity.description}
+                      </span>
+                    </div>
+                    <span className={`text-xs sm:text-sm ${activity.color.split(' ')[0].replace('-600', '-600')}`}>
+                      {formatTimeAgo(activity.date)}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-4">
+                  <p className="text-blue-700 text-sm sm:text-base">Start tracking your activities to see your progress here!</p>
                 </div>
-                <span className="text-green-600 text-xs sm:text-sm">Yesterday</span>
-              </div>
-              
-              <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
-                  <span className="text-blue-800 text-sm sm:text-base">Breathing exercise completed</span>
-                </div>
-                <span className="text-blue-600 text-xs sm:text-sm">2 days ago</span>
-              </div>
-              
-              <div className="text-center py-4">
-                <p className="text-blue-700 text-sm sm:text-base">Start tracking your activities to see your progress here!</p>
-              </div>
+              )}
             </div>
           </CardContent>
         </Card>

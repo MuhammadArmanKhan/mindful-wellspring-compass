@@ -4,14 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Heart, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 const MoodTracker = () => {
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
   const [note, setNote] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const moods = [
     { value: 1, emoji: "😢", label: "Very Low", color: "bg-red-100 border-red-300 text-red-800" },
@@ -24,6 +28,16 @@ const MoodTracker = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to track your mood.",
+        variant: "destructive",
+      });
+      navigate("/login");
+      return;
+    }
+
     if (selectedMood === null) {
       toast({
         title: "Please Select Your Mood",
@@ -35,14 +49,18 @@ const MoodTracker = () => {
 
     setIsSubmitting(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      console.log("Mood submission:", {
-        mood: selectedMood,
-        note,
-        timestamp: new Date().toISOString(),
-        userId: localStorage.getItem("userEmail")
-      });
+    try {
+      const { error } = await supabase
+        .from('moods')
+        .insert([
+          {
+            user_id: user.id,
+            mood_score: selectedMood,
+            note: note.trim() || null
+          }
+        ]);
+
+      if (error) throw error;
 
       toast({
         title: "Mood Recorded Successfully",
@@ -52,8 +70,16 @@ const MoodTracker = () => {
       // Reset form
       setSelectedMood(null);
       setNote("");
+    } catch (error: any) {
+      console.error("Error saving mood:", error);
+      toast({
+        title: "Failed to Save Mood",
+        description: error.message || "Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
       setIsSubmitting(false);
-    }, 1500);
+    }
   };
 
   return (

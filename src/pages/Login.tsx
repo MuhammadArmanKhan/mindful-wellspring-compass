@@ -7,46 +7,27 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Heart } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [language, setLanguage] = useState("en");
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { signIn, loading } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    // Simulate login process
-    setTimeout(() => {
-      console.log("Login attempt:", { email, language });
-      
-      // Mock role-based redirect
-      const mockRole = email.includes("admin") ? "admin" : "user";
-      
-      toast({
-        title: "Login Successful",
-        description: `Welcome back! Redirecting to your ${mockRole} dashboard.`,
-      });
-
-      // Store language preference
-      localStorage.setItem("userLanguage", language);
-      localStorage.setItem("userRole", mockRole);
-      localStorage.setItem("userEmail", email);
-
-      // Redirect based on role
-      if (mockRole === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/dashboard");
-      }
-      
-      setIsLoading(false);
-    }, 1500);
+    
+    try {
+      await signIn(email, password);
+      // The navigation will be handled by the auth state change
+      // Admin users will be redirected in the Dashboard component
+      navigate("/dashboard");
+    } catch (error) {
+      // Error handling is done in the useAuth hook
+      console.error("Login failed:", error);
+    }
   };
 
   return (
@@ -90,27 +71,12 @@ const Login = () => {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="language" className="text-blue-900 text-sm sm:text-base">Preferred Language</Label>
-              <Select value={language} onValueChange={setLanguage}>
-                <SelectTrigger className="bg-white/70 border-blue-200 focus:border-green-500">
-                  <SelectValue placeholder="Select language" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="en">English</SelectItem>
-                  <SelectItem value="es">Español</SelectItem>
-                  <SelectItem value="fr">Français</SelectItem>
-                  <SelectItem value="de">Deutsch</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
             <Button 
               type="submit" 
               className="w-full bg-green-600 hover:bg-green-700 text-white text-sm sm:text-base py-2 sm:py-3"
-              disabled={isLoading}
+              disabled={loading}
             >
-              {isLoading ? "Signing In..." : "Sign In"}
+              {loading ? "Signing In..." : "Sign In"}
             </Button>
           </form>
 

@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Heart } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 
 const Register = () => {
@@ -17,8 +18,8 @@ const Register = () => {
   const [language, setLanguage] = useState("en");
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [agreePrivacy, setAgreePrivacy] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { signUp, loading } = useAuth();
   const { toast } = useToast();
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -33,6 +34,15 @@ const Register = () => {
       return;
     }
 
+    if (password.length < 8) {
+      toast({
+        title: "Password Too Short",
+        description: "Password must be at least 8 characters long.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!agreeTerms || !agreePrivacy) {
       toast({
         title: "Agreement Required",
@@ -42,25 +52,13 @@ const Register = () => {
       return;
     }
 
-    setIsLoading(true);
-
-    // Simulate registration process
-    setTimeout(() => {
-      console.log("Registration attempt:", { email, language });
-      
-      toast({
-        title: "Account Created Successfully!",
-        description: "Welcome to Wellbeing Support. Redirecting to your dashboard.",
-      });
-
-      // Store user data
-      localStorage.setItem("userLanguage", language);
-      localStorage.setItem("userRole", "user");
-      localStorage.setItem("userEmail", email);
-
+    try {
+      await signUp(email, password, language);
       navigate("/dashboard");
-      setIsLoading(false);
-    }, 2000);
+    } catch (error) {
+      // Error handling is done in the useAuth hook
+      console.error("Registration failed:", error);
+    }
   };
 
   return (
@@ -96,7 +94,7 @@ const Register = () => {
               <Input
                 id="password"
                 type="password"
-                placeholder="Create a strong password"
+                placeholder="Create a strong password (min 8 characters)"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -160,9 +158,9 @@ const Register = () => {
             <Button 
               type="submit" 
               className="w-full bg-green-600 hover:bg-green-700 text-white"
-              disabled={isLoading}
+              disabled={loading}
             >
-              {isLoading ? "Creating Account..." : "Create Account"}
+              {loading ? "Creating Account..." : "Create Account"}
             </Button>
           </form>
 
