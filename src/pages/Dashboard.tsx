@@ -54,27 +54,27 @@ const Dashboard = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-blue-100">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm border-b border-blue-200">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+        <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
-            <Heart className="h-8 w-8 text-green-600" />
-            <h1 className="text-2xl font-bold text-blue-900">Wellbeing Support</h1>
+            <Heart className="h-6 w-6 sm:h-8 sm:w-8 text-green-600" />
+            <h1 className="text-lg sm:text-2xl font-bold text-blue-900">Wellbeing Support</h1>
           </div>
-          <div className="flex items-center space-x-4">
-            <span className="text-blue-700">Welcome, {userEmail.split('@')[0]}</span>
-            <Button variant="outline" onClick={handleLogout} className="bg-white/50">
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            <span className="text-sm sm:text-base text-blue-700 hidden sm:inline">Welcome, {userEmail.split('@')[0]}</span>
+            <Button variant="outline" onClick={handleLogout} className="bg-white/50 text-sm sm:text-base px-2 sm:px-4">
               Logout
             </Button>
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
         {/* Welcome Section */}
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-blue-900 mb-2">
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-2xl sm:text-3xl font-bold text-blue-900 mb-2">
             Good {timeOfDay}! 
           </h2>
-          <p className="text-blue-700 text-lg">
+          <p className="text-blue-700 text-base sm:text-lg">
             {currentTime.toLocaleDateString('en-US', { 
               weekday: 'long', 
               year: 'numeric', 
@@ -85,28 +85,28 @@ const Dashboard = () => {
         </div>
 
         {/* Daily Message Card */}
-        <Card className="mb-8 bg-gradient-to-r from-green-100 to-blue-100 border-green-200">
+        <Card className="mb-6 sm:mb-8 bg-gradient-to-r from-green-100 to-blue-100 border-green-200">
           <CardHeader>
-            <CardTitle className="flex items-center text-green-800">
-              <Heart className="h-6 w-6 mr-2" />
+            <CardTitle className="flex items-center text-green-800 text-base sm:text-lg">
+              <Heart className="h-5 w-5 sm:h-6 sm:w-6 mr-2" />
               Your Daily Message
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-green-700 text-lg italic leading-relaxed">
+            <p className="text-green-700 text-base sm:text-lg italic leading-relaxed">
               "{dailyMessage}"
             </p>
           </CardContent>
         </Card>
 
         {/* Quick Actions Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <Link to="/mood">
-            <Card className="bg-white/60 backdrop-blur-sm border-blue-200 hover:shadow-lg transition-all hover:scale-105">
-              <CardHeader className="text-center">
-                <Heart className="h-12 w-12 text-red-500 mx-auto mb-2" />
-                <CardTitle className="text-blue-900">Track Your Mood</CardTitle>
-                <CardDescription className="text-blue-700">
+            <Card className="bg-white/60 backdrop-blur-sm border-blue-200 hover:shadow-lg transition-all hover:scale-105 h-full">
+              <CardHeader className="text-center p-4 sm:p-6">
+                <Heart className="h-10 w-10 sm:h-12 sm:w-12 text-red-500 mx-auto mb-2" />
+                <CardTitle className="text-blue-900 text-base sm:text-lg">Track Your Mood</CardTitle>
+                <CardDescription className="text-blue-700 text-sm sm:text-base">
                   How are you feeling today? Let's check in with your emotions.
                 </CardDescription>
               </CardHeader>
@@ -114,23 +114,23 @@ const Dashboard = () => {
           </Link>
 
           <Link to="/exercises">
-            <Card className="bg-white/60 backdrop-blur-sm border-blue-200 hover:shadow-lg transition-all hover:scale-105">
-              <CardHeader className="text-center">
-                <Activity className="h-12 w-12 text-blue-600 mx-auto mb-2" />
-                <CardTitle className="text-blue-900">Guided Exercises</CardTitle>
-                <CardDescription className="text-blue-700">
+            <Card className="bg-white/60 backdrop-blur-sm border-blue-200 hover:shadow-lg transition-all hover:scale-105 h-full">
+              <CardHeader className="text-center p-4 sm:p-6">
+                <Activity className="h-10 w-10 sm:h-12 sm:w-12 text-blue-600 mx-auto mb-2" />
+                <CardTitle className="text-blue-900 text-base sm:text-lg">Guided Exercises</CardTitle>
+                <CardDescription className="text-blue-700 text-sm sm:text-base">
                   Breathing, journaling, and mindfulness exercises for your wellbeing.
                 </CardDescription>
               </CardHeader>
             </Card>
           </Link>
 
-          <Link to="/summary">
-            <Card className="bg-white/60 backdrop-blur-sm border-blue-200 hover:shadow-lg transition-all hover:scale-105">
-              <CardHeader className="text-center">
-                <BarChart3 className="h-12 w-12 text-purple-600 mx-auto mb-2" />
-                <CardTitle className="text-blue-900">Weekly Summary</CardTitle>
-                <CardDescription className="text-blue-700">
+          <Link to="/summary" className="sm:col-span-2 lg:col-span-1">
+            <Card className="bg-white/60 backdrop-blur-sm border-blue-200 hover:shadow-lg transition-all hover:scale-105 h-full">
+              <CardHeader className="text-center p-4 sm:p-6">
+                <BarChart3 className="h-10 w-10 sm:h-12 sm:w-12 text-purple-600 mx-auto mb-2" />
+                <CardTitle className="text-blue-900 text-base sm:text-lg">Weekly Summary</CardTitle>
+                <CardDescription className="text-blue-700 text-sm sm:text-base">
                   See your progress and get feedback from support staff.
                 </CardDescription>
               </CardHeader>
@@ -139,27 +139,29 @@ const Dashboard = () => {
         </div>
 
         {/* Emergency Section */}
-        <Card className="bg-gradient-to-r from-red-50 to-orange-50 border-red-200 mb-8">
+        <Card className="bg-gradient-to-r from-red-50 to-orange-50 border-red-200 mb-6 sm:mb-8">
           <CardHeader>
-            <CardTitle className="flex items-center text-red-800">
-              <AlertTriangle className="h-6 w-6 mr-2" />
+            <CardTitle className="flex items-center text-red-800 text-base sm:text-lg">
+              <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6 mr-2" />
               Need Immediate Support?
             </CardTitle>
-            <CardDescription className="text-red-700">
+            <CardDescription className="text-red-700 text-sm sm:text-base">
               If you're experiencing a crisis or need immediate help, don't hesitate to reach out.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link to="/emergency" className="flex-1">
-                <Button className="w-full bg-red-600 hover:bg-red-700 text-white text-lg py-6">
+            <div className="flex flex-col space-y-4">
+              <Link to="/emergency" className="w-full">
+                <Button className="w-full bg-red-600 hover:bg-red-700 text-white text-base sm:text-lg py-4 sm:py-6">
                   Emergency Alert
                 </Button>
               </Link>
-              <div className="flex-1 text-center sm:text-left">
-                <p className="text-red-700 font-medium mb-2">Crisis Hotlines:</p>
-                <p className="text-red-600">988 - Suicide & Crisis Lifeline</p>
-                <p className="text-red-600">741741 - Crisis Text Line</p>
+              <div className="text-center">
+                <p className="text-red-700 font-medium mb-2 text-sm sm:text-base">Crisis Hotlines:</p>
+                <div className="space-y-1">
+                  <p className="text-red-600 text-sm sm:text-base">988 - Suicide & Crisis Lifeline</p>
+                  <p className="text-red-600 text-sm sm:text-base">741741 - Crisis Text Line</p>
+                </div>
               </div>
             </div>
           </CardContent>
@@ -168,28 +170,28 @@ const Dashboard = () => {
         {/* Recent Activity */}
         <Card className="bg-white/60 backdrop-blur-sm border-blue-200">
           <CardHeader>
-            <CardTitle className="text-blue-900">Your Recent Activity</CardTitle>
+            <CardTitle className="text-blue-900 text-base sm:text-lg">Your Recent Activity</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                 <div className="flex items-center space-x-3">
-                  <Heart className="h-5 w-5 text-green-600" />
-                  <span className="text-green-800">Mood tracked</span>
+                  <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+                  <span className="text-green-800 text-sm sm:text-base">Mood tracked</span>
                 </div>
-                <span className="text-green-600 text-sm">Yesterday</span>
+                <span className="text-green-600 text-xs sm:text-sm">Yesterday</span>
               </div>
               
               <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
                 <div className="flex items-center space-x-3">
-                  <Activity className="h-5 w-5 text-blue-600" />
-                  <span className="text-blue-800">Breathing exercise completed</span>
+                  <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+                  <span className="text-blue-800 text-sm sm:text-base">Breathing exercise completed</span>
                 </div>
-                <span className="text-blue-600 text-sm">2 days ago</span>
+                <span className="text-blue-600 text-xs sm:text-sm">2 days ago</span>
               </div>
               
               <div className="text-center py-4">
-                <p className="text-blue-700">Start tracking your activities to see your progress here!</p>
+                <p className="text-blue-700 text-sm sm:text-base">Start tracking your activities to see your progress here!</p>
               </div>
             </div>
           </CardContent>

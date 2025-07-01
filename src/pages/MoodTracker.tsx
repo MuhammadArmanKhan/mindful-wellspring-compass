@@ -60,25 +60,25 @@ const MoodTracker = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-blue-100">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm border-b border-blue-200">
-        <div className="container mx-auto px-4 py-4 flex items-center">
-          <Link to="/dashboard" className="mr-4">
-            <Button variant="outline" size="sm" className="bg-white/50">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
+        <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 flex items-center">
+          <Link to="/dashboard" className="mr-3 sm:mr-4">
+            <Button variant="outline" size="sm" className="bg-white/50 px-2 sm:px-3">
+              <ArrowLeft className="h-4 w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Back</span>
             </Button>
           </Link>
           <div className="flex items-center space-x-2">
-            <Heart className="h-8 w-8 text-green-600" />
-            <h1 className="text-2xl font-bold text-blue-900">Mood Tracker</h1>
+            <Heart className="h-6 w-6 sm:h-8 sm:w-8 text-green-600" />
+            <h1 className="text-lg sm:text-2xl font-bold text-blue-900">Mood Tracker</h1>
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8 max-w-2xl">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-2xl">
         <Card className="bg-white/80 backdrop-blur-sm border-blue-200">
           <CardHeader>
-            <CardTitle className="text-2xl text-blue-900 text-center">How Are You Feeling Today?</CardTitle>
-            <CardDescription className="text-center text-blue-700">
+            <CardTitle className="text-xl sm:text-2xl text-blue-900 text-center">How Are You Feeling Today?</CardTitle>
+            <CardDescription className="text-center text-blue-700 text-sm sm:text-base">
               Take a moment to check in with yourself. Your feelings are valid and important.
             </CardDescription>
           </CardHeader>
@@ -86,23 +86,23 @@ const MoodTracker = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Mood Selection */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-blue-900">Select Your Current Mood</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
+                <h3 className="text-base sm:text-lg font-semibold text-blue-900">Select Your Current Mood</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3">
                   {moods.map((mood) => (
                     <button
                       key={mood.value}
                       type="button"
                       onClick={() => setSelectedMood(mood.value)}
                       className={`
-                        p-4 rounded-lg border-2 transition-all hover:scale-105 text-center
+                        p-3 sm:p-4 rounded-lg border-2 transition-all hover:scale-105 text-center
                         ${selectedMood === mood.value 
                           ? mood.color + " ring-2 ring-blue-500" 
                           : "bg-white border-gray-200 hover:bg-gray-50"
                         }
                       `}
                     >
-                      <div className="text-3xl mb-2">{mood.emoji}</div>
-                      <div className="text-sm font-medium">{mood.label}</div>
+                      <div className="text-2xl sm:text-3xl mb-1 sm:mb-2">{mood.emoji}</div>
+                      <div className="text-xs sm:text-sm font-medium">{mood.label}</div>
                     </button>
                   ))}
                 </div>
@@ -110,7 +110,7 @@ const MoodTracker = () => {
 
               {/* Optional Note */}
               <div className="space-y-2">
-                <label htmlFor="note" className="text-lg font-semibold text-blue-900">
+                <label htmlFor="note" className="text-base sm:text-lg font-semibold text-blue-900">
                   What's on your mind? (Optional)
                 </label>
                 <Textarea
@@ -118,16 +118,16 @@ const MoodTracker = () => {
                   placeholder="Share anything you'd like about how you're feeling today. This can help you and your support team understand your emotional patterns."
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
-                  className="bg-white/70 border-blue-200 focus:border-green-500 min-h-[120px]"
+                  className="bg-white/70 border-blue-200 focus:border-green-500 min-h-[100px] sm:min-h-[120px] text-sm sm:text-base"
                   maxLength={500}
                 />
-                <p className="text-sm text-blue-600">{note.length}/500 characters</p>
+                <p className="text-xs sm:text-sm text-blue-600">{note.length}/500 characters</p>
               </div>
 
               {/* Submit Button */}
               <Button 
                 type="submit" 
-                className="w-full bg-green-600 hover:bg-green-700 text-white text-lg py-6"
+                className="w-full bg-green-600 hover:bg-green-700 text-white text-base sm:text-lg py-4 sm:py-6"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Recording Your Mood..." : "Record My Mood"}
@@ -137,11 +137,11 @@ const MoodTracker = () => {
         </Card>
 
         {/* Tips Card */}
-        <Card className="mt-6 bg-blue-50/80 backdrop-blur-sm border-blue-200">
+        <Card className="mt-4 sm:mt-6 bg-blue-50/80 backdrop-blur-sm border-blue-200">
           <CardHeader>
-            <CardTitle className="text-blue-900">💡 Mood Tracking Tips</CardTitle>
+            <CardTitle className="text-blue-900 text-base sm:text-lg">💡 Mood Tracking Tips</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2 text-blue-700">
+          <CardContent className="space-y-2 text-blue-700 text-sm sm:text-base">
             <p>• Try to track your mood at the same time each day</p>
             <p>• Be honest with yourself - there are no wrong answers</p>
             <p>• Notice patterns over time - this helps identify triggers and positive influences</p>
